@@ -1,0 +1,19 @@
+server:
+  port: 8081
+app:
+  jwt:
+    secret: YXBwLWp3dC1zZWNyZXQtZm9yLWV4cGVuc2UtdHJhY2tlci1hcGktMjAyNg==
+    expiration-ms: 86400000
+spring:
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  datasource:
+    username: postgres
+    password: postgres
+    url: jdbc:postgresql://localhost:5432/postgres_db
+    driver-class-name: org.postgresql.Driver
