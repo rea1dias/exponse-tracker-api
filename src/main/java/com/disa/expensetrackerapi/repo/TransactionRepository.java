@@ -1,14 +1,13 @@
 package com.disa.expensetrackerapi.repo;
 
-import com.disa.expensetrackerapi.domain.entity.Category;
+import com.disa.expensetrackerapi.domain.entity.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface CategoryRepository extends JpaRepository<Category, Long> {
+public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
-    List<Category> findByUserId(Long userId);
-
+    List<Transaction> findByUserId(Long userId);
 }
