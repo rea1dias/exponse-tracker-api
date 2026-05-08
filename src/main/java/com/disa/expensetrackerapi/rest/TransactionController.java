@@ -2,12 +2,14 @@ package com.disa.expensetrackerapi.rest;
 
 import com.disa.expensetrackerapi.domain.dto.transaction.TransactionRequest;
 import com.disa.expensetrackerapi.domain.dto.transaction.TransactionResponse;
+import com.disa.expensetrackerapi.enums.CategoryType;
 import com.disa.expensetrackerapi.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -30,7 +32,29 @@ public class TransactionController {
         return ResponseEntity.ok().body(transactionService.getAllTransactions());
     }
 
+    @GetMapping("/get/{transactionId}")
+    @ResponseStatus(HttpStatus.FOUND)
+    public ResponseEntity<TransactionResponse> getTransaction(@PathVariable Long transactionId) {
+        return ResponseEntity.ok().body(transactionService.getTransaction(transactionId));
+    }
 
+    @DeleteMapping("/{transactionId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Void> deleteTransaction(@PathVariable Long transactionId) {
+        transactionService.deleteTransaction(transactionId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PostMapping("/getMyTransactions")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<List<TransactionResponse>> getAllTransactionsByUserId(
+            @RequestParam CategoryType type,
+            @RequestParam Long categoryId,
+            @RequestParam LocalDate from,
+            @RequestParam LocalDate to
+    ) {
+        return ResponseEntity.ok().body(transactionService.getTransactions(type, categoryId, from, to));
+    }
 
 
 

@@ -5,6 +5,7 @@ import com.disa.expensetrackerapi.domain.dto.transaction.TransactionResponse;
 import com.disa.expensetrackerapi.domain.entity.Category;
 import com.disa.expensetrackerapi.domain.entity.Transaction;
 import com.disa.expensetrackerapi.domain.entity.User;
+import com.disa.expensetrackerapi.enums.CategoryType;
 import com.disa.expensetrackerapi.exception.BadRequestException;
 import com.disa.expensetrackerapi.exception.NotFoundException;
 import com.disa.expensetrackerapi.mapper.TransactionMapper;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -61,4 +63,45 @@ public class TransactionServiceImpl implements TransactionService {
                 .map(transactionMapper::toResponse)
                 .toList();
     }
+
+    @Override
+    public TransactionResponse getTransaction(Long transactionId) {
+        Long userId = securityService.getCurrentUserId();
+        Transaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new NotFoundException("Transaction not found"));
+        if (!transaction.getCategory().getUser().getId().equals(userId)) {
+            throw new BadRequestException("You don't have access to this category");
+        }
+        return transactionMapper.toResponse(transaction);
+    }
+
+    @Override
+    public void deleteTransaction(Long transactionId) {
+        Long userId = securityService.getCurrentUserId();
+        Transaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new NotFoundException("Transaction not found"));
+        if (!transaction.getCategory().getUser().getId().equals(userId)) {
+            throw new BadRequestException("You don't have access to this category");
+        }
+        transactionRepository.delete(transaction);
+    }
+
+    @Override
+    public List<TransactionResponse> getTransactions(CategoryType type,
+                                                     Long categoryId,
+                                                     LocalDate from,
+                                                     LocalDate to) {
+        Long userId = securityService.getCurrentUserId();
+        List<Transaction> transactions = transactionRepository.findTransaction(userId, type, categoryId, from, to);
+
+        List<TransactionResponse> response = new ArrayList<>();
+        for (Transaction transaction : transactions) {
+            response.add(transactionMapper.toResponse(transaction));
+        }
+        return response;
+    }
+
+
+
+
 }
