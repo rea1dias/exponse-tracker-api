@@ -1,5 +1,6 @@
 package com.disa.expensetrackerapi.service;
 
+import com.disa.expensetrackerapi.domain.dto.dashboard.TotalResponse;
 import com.disa.expensetrackerapi.domain.dto.transaction.TransactionRequest;
 import com.disa.expensetrackerapi.domain.dto.transaction.TransactionResponse;
 import com.disa.expensetrackerapi.enums.CategoryType;
@@ -19,5 +20,6 @@ public interface TransactionService  {
 
     List<TransactionResponse> getTransactions(CategoryType type, Long categoryId, LocalDate from, LocalDate to);
 
+    TotalResponse getTotalByMonth(Integer year, Integer month);
 
 }
