@@ -1,5 +1,6 @@
 package com.disa.expensetrackerapi.service.impl;
 
+import com.disa.expensetrackerapi.domain.dto.dashboard.TotalResponse;
 import com.disa.expensetrackerapi.domain.dto.transaction.TransactionRequest;
 import com.disa.expensetrackerapi.domain.dto.transaction.TransactionResponse;
 import com.disa.expensetrackerapi.domain.entity.Category;
@@ -12,11 +13,13 @@ import com.disa.expensetrackerapi.mapper.TransactionMapper;
 import com.disa.expensetrackerapi.repo.CategoryRepository;
 import com.disa.expensetrackerapi.repo.TransactionRepository;
 import com.disa.expensetrackerapi.repo.UserRepository;
+import com.disa.expensetrackerapi.service.DateRangeService;
 import com.disa.expensetrackerapi.service.SecurityService;
 import com.disa.expensetrackerapi.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +33,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final CategoryRepository categoryRepository;
     private final TransactionMapper transactionMapper;
     private final UserRepository userRepository;
+    private final DateRangeService dateRangeService;
 
     @Override
     public TransactionResponse createTransaction(TransactionRequest request, Long categoryId) {
@@ -101,7 +105,22 @@ public class TransactionServiceImpl implements TransactionService {
         return response;
     }
 
+    @Override
+    public TotalResponse getTotalByMonth(Integer year, Integer month) {
+        Long userId = securityService.getCurrentUserId();
 
+        LocalDate from = dateRangeService.getStartOfMonth(year, month);
+        LocalDate to = dateRangeService.getEndOfMonth(year, month);
 
+        BigDecimal income = transactionRepository.sumIncome(userId, from, to);
+        BigDecimal expense = transactionRepository.sumIncome(userId, from, to);
+        BigDecimal balance = income.subtract(expense);
 
+        TotalResponse response = TotalResponse.builder()
+                .totalIncome(income)
+                .totalExpense(expense)
+                .balance(balance)
+                .build();
+        return response;
+    }
 }

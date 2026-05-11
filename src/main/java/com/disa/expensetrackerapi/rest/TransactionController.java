@@ -1,10 +1,12 @@
 package com.disa.expensetrackerapi.rest;
 
+import com.disa.expensetrackerapi.domain.dto.dashboard.TotalResponse;
 import com.disa.expensetrackerapi.domain.dto.transaction.TransactionRequest;
 import com.disa.expensetrackerapi.domain.dto.transaction.TransactionResponse;
 import com.disa.expensetrackerapi.enums.CategoryType;
 import com.disa.expensetrackerapi.service.TransactionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -54,6 +56,13 @@ public class TransactionController {
             @RequestParam LocalDate to
     ) {
         return ResponseEntity.ok().body(transactionService.getTransactions(type, categoryId, from, to));
+    }
+
+    @PostMapping("/getTotal")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<TotalResponse> getMonthlySummary(@RequestParam("year") Integer year,
+                                                           @RequestParam("month") Integer month) {
+        return ResponseEntity.ok().body(transactionService.getTotalByMonth(year, month));
     }
 
 
